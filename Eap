@@ -1,0 +1,19 @@
+import dpkt
+
+def detect_wpa2_eapols(pcap_filename):
+    with open(pcap_filename, 'rb') as pcap_file:
+        pcap = dpkt.pcap.Reader(pcap_file)
+
+        for ts, buf in pcap:
+            eth = dpkt.ethernet.Ethernet(buf)
+
+            # Check if the Ethernet frame is a Wi-Fi frame and contains WPA2 EAPOL
+            if isinstance(eth.data, dpkt.dot11.Dot11) and hasattr(eth.data, 'data'):
+                dot11_frame = eth.data
+                if isinstance(dot11_frame.data, dpkt.dot11.Dot11Elt) and hasattr(dot11_frame.data, 'info') and dot11_frame.data.info == 8:
+                    # Check if it's a WPA2 EAPOL frame (EAPOL type 0x888e)
+                    if isinstance(dot11_frame.data.data, dpkt.eap.EAPOL) and dot11_frame.data.data.type == 0x888e:
+                        print(f"WPA2 EAPOL Packet detected at timestamp {ts}")
+
+# Replace 'your_pcap_file.pcap' with the actual path to your pcap file
+detect_wpa2_eapols('your_pcap_file.pcap')
