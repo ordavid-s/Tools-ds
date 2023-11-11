@@ -1,0 +1,10 @@
+from scapy.all import RadioTap, Dot11, sendp
+
+# Set the interface to your wireless interface (e.g., wlan0)
+interface = "wlan0"
+
+# Create a Null Data frame with the Acknowledgment (ACK) flag set
+null_data_frame = RadioTap() / Dot11(type=2, subtype=4, FCfield=0x1)  # FCfield=0x1 sets the Acknowledgment flag
+
+# Send the Null Data frame
+sendp(null_data_frame, iface=interface, verbose=True)
